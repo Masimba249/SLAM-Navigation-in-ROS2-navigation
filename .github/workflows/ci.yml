@@ -1,41 +1,29 @@
-name: ROS2 CI
+name: CI
 
 on:
   push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-22.04
-    container:
-      image: ros:humble
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          apt-get update
-          rosdep update
-          rosdep install --from-paths src --ignore-src -r -y
-          apt-get install -y \
-            ros-humble-slam-toolbox \
-            ros-humble-nav2-bringup \
-            ros-humble-gazebo-ros-pkgs \
-            ros-humble-robot-state-publisher \
-            python3-colcon-common-extensions
+      - name: Setup
+        run: | 
+          source setup.sh
+        shell: bash
 
-      - name: Build workspace
-        run: |
-          source /opt/ros/humble/setup.bash
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: | 
+          source build.sh
+        shell: bash
 
-      - name: Run tests
+      - name: Test
         run: |
-          source /opt/ros/humble/setup.bash
-          source install/setup.bash
-          colcon test --packages-select amr_description amr_slam amr_navigation
-          colcon test-result --verbose
+          source test.sh
+        shell: bash
