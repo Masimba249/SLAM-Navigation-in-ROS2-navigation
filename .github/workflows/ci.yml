@@ -35,7 +35,13 @@ jobs:
             python3-colcon-common-extensions
 
       - name: Build
-        run: source .github/workflows/build.sh
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
       - name: Test
-       run: source .github/workflows/test.sh
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
+          colcon test --packages-select amr_description amr_slam amr_navigation
+          colcon test-result --verbose
