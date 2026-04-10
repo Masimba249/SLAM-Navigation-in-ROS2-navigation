@@ -4,26 +4,38 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    container:
+      image: ros:humble
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup
-        run: | 
-          source setup.sh
-        shell: bash
+        run: |
+          apt-get update
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+          apt-get install -y \
+            ros-humble-slam-toolbox \
+            ros-humble-nav2-bringup \
+            ros-humble-gazebo-ros-pkgs \
+            ros-humble-robot-state-publisher \
+            python3-colcon-common-extensions
 
       - name: Build
-        run: | 
-          source build.sh
-        shell: bash
+        run: source build.sh
 
       - name: Test
-        run: |
-          source test.sh
-        shell: bash
+        run: source test.sh
