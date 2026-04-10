@@ -35,7 +35,7 @@ jobs:
             python3-colcon-common-extensions
 
       - name: Build
-        run: source build.sh
+        run: source .github/workflows/build.sh
 
       - name: Test
-        run: source test.sh
+       run: source .github/workflows/test.sh
