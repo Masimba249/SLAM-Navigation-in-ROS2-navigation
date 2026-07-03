@@ -10,6 +10,12 @@
 ![Gazebo](https://img.shields.io/badge/Gazebo-Harmonic-red)
 ![CI](https://github.com/YOUR_USERNAME/ros2_slam_nav2_amr/actions/workflows/ci.yml/badge.svg)
 
+## 🎥 Demo
+
+<video src="https://github.com/Masimba249/SLAM-Navigation-in-ROS2-navigation/raw/main/Video%20Demo.webm" controls width="100%"></video>
+
+*Doesn't play above? [Download the video directly](Video%20Demo.webm).*
+
 ## 📦 Stack
 
 | Component            | Package                     |
