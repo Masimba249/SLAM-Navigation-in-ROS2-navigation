@@ -12,9 +12,9 @@
 
 ## 🎥 Demo
 
-<video src="https://github.com/Masimba249/SLAM-Navigation-in-ROS2-navigation/raw/main/Video%20Demo.webm" controls width="100%"></video>
+![Demo](demo.gif)
 
-*Doesn't play above? [Download the video directly](Video%20Demo.webm).*
+*Full-quality recording: [Video Demo.webm](Video%20Demo.webm).*
 
 ## 📦 Stack
 
