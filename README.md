@@ -14,7 +14,7 @@
 
 ![Demo](demo.gif)
 
-*Full-quality recording: [Video Demo.webm](Video%20Demo.webm).*
+*Full-quality recording: [Video_Demo.webm](Video_Demo.webm).*
 
 ## 📦 Stack
 
