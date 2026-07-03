@@ -39,28 +39,33 @@
     </inertial>
   </link>
 
+  <!-- Wheels -->
+  <xacro:wheel prefix="left"  reflect="1"/>
+  <xacro:wheel prefix="right" reflect="-1"/>
+
   <!-- LiDAR sensor -->
   <xacro:lidar_sensor parent="base_link" xyz="0.15 0 ${base_height/2 + 0.02}"/>
 
   <!-- IMU sensor -->
   <xacro:imu_sensor parent="base_link" xyz="0 0 0"/>
 
-  <!-- Differential drive plugin -->
+  <!-- Differential drive plugin (Gazebo Harmonic / gz-sim) -->
   <gazebo>
-    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
-      <ros><namespace>/amr</namespace></ros>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
       <left_joint>wheel_left_joint</left_joint>
       <right_joint>wheel_right_joint</right_joint>
       <wheel_separation>${base_width + wheel_width}</wheel_separation>
-      <wheel_diameter>${2 * wheel_radius}</wheel_diameter>
-      <max_wheel_torque>20</max_wheel_torque>
-      <max_wheel_acceleration>1.0</max_wheel_acceleration>
-      <command_topic>cmd_vel</command_topic>
-      <publish_odom>true</publish_odom>
-      <publish_odom_tf>true</publish_odom_tf>
-      <odometry_topic>odom</odometry_topic>
-      <odometry_frame>odom</odometry_frame>
-      <robot_base_frame>base_footprint</robot_base_frame>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/model/amr_robot/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <odom_publish_frequency>20</odom_publish_frequency>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>/joint_states</topic>
     </plugin>
   </gazebo>
 

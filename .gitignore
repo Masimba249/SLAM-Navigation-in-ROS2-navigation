@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+# colcon build artifacts
+build/
+install/
+log/
+
+# Python bytecode
+__pycache__/
+*.pyc

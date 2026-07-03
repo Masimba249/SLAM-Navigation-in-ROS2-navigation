@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="imu_sensor" params="parent xyz">
+    <joint name="imu_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="imu_link"/>
+      <origin xyz="${xyz}" rpy="0 0 0"/>
+    </joint>
+
+    <link name="imu_link">
+      <visual>
+        <geometry><box size="0.02 0.02 0.02"/></geometry>
+        <material name="red"><color rgba="0.8 0.1 0.1 1"/></material>
+      </visual>
+      <inertial>
+        <mass value="0.05"/>
+        <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+      </inertial>
+    </link>
+
+    <gazebo reference="imu_link">
+      <sensor type="imu" name="imu_sensor">
+        <topic>/imu</topic>
+        <gz_frame_id>imu_link</gz_frame_id>
+        <always_on>true</always_on>
+        <update_rate>50</update_rate>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+</robot>

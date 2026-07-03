@@ -3,8 +3,9 @@ from launch import LaunchDescription
 from launch.actions import (
     IncludeLaunchDescription, DeclareLaunchArgument, TimerAction
 )
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
@@ -13,12 +14,14 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     slam_mode    = LaunchConfiguration('slam_mode',    default='mapping')
+    explore      = LaunchConfiguration('explore',      default='true')
 
     # ── Package paths ────────────────────────────────────────────────────────
     pkg_gazebo  = get_package_share_directory('amr_gazebo')
     pkg_desc    = get_package_share_directory('amr_description')
     pkg_slam    = get_package_share_directory('amr_slam')
     pkg_nav     = get_package_share_directory('amr_navigation')
+    pkg_explore = get_package_share_directory('amr_explore')
 
     # ── 1. Gazebo world ──────────────────────────────────────────────────────
     gazebo_launch = IncludeLaunchDescription(
@@ -31,22 +34,23 @@ def generate_launch_description():
     robot_description_path = os.path.join(
         pkg_desc, 'urdf', 'robot.urdf.xacro'
     )
+    robot_description = Command(['xacro ', robot_description_path])
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         parameters=[{
             'use_sim_time': use_sim_time,
-            'robot_description': open(robot_description_path).read()
+            'robot_description': robot_description
         }],
         output='screen'
     )
 
-    # ── 3. Spawn robot in Gazebo ─────────────────────────────────────────────
+    # ── 3. Spawn robot in Gazebo (Harmonic / gz-sim) ─────────────────────────
     spawn_robot = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
+        package='ros_gz_sim',
+        executable='create',
         arguments=[
-            '-entity', 'amr_robot',
+            '-name', 'amr_robot',
             '-topic', 'robot_description',
             '-x', '0.0', '-y', '0.0', '-z', '0.05'
         ],
@@ -78,7 +82,18 @@ def generate_launch_description():
         )]
     )
 
-    # ── 6. RViz2 ─────────────────────────────────────────────────────────────
+    # ── 6. Frontier exploration (delayed 8s so Nav2/SLAM are up first) ───────
+    explore_launch = TimerAction(
+        period=8.0,
+        actions=[IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_explore, 'launch', 'explore.launch.py')
+            ),
+            condition=IfCondition(explore)
+        )]
+    )
+
+    # ── 7. RViz2 ─────────────────────────────────────────────────────────────
     rviz_config = os.path.join(pkg_desc, 'rviz', 'robot_view.rviz')
     rviz = TimerAction(
         period=6.0,
@@ -94,10 +109,12 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('slam_mode',    default_value='mapping'),
+        DeclareLaunchArgument('explore',      default_value='true'),
         gazebo_launch,
         robot_state_publisher,
         spawn_robot,
         slam_launch,
         nav2_launch,
+        explore_launch,
         rviz,
     ])
